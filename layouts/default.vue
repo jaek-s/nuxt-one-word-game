@@ -1,15 +1,22 @@
+<script setup>
+const handleLogOut = () => {
+    const auth = useFirebaseAuth();
+    auth.signOut();
+};
+</script>
+
 <template>
-    <div
-        class="max-w-screen-sm mx-auto mt-16 px-8 flex flex-col justify-between gap-8 items-center sm:items-stretch sm:flex-row"
+    <header
+        class="bg-stone-900 w-screen mx-[calc(50%-50vw)] mb-12 shadow shadow-stone-900"
     >
-        <header class="w-64">
-            <h1 class="text-7xl font-black">One<br />Word<br />Game</h1>
-            <h2 class="text-lg font-medium text-stone-400">
-                Write a story with friends,<br />one word at a time.
-            </h2>
-        </header>
-        <main class="grow flex">
-            <slot />
-        </main>
+        <div class="max-w-screen-md mx-auto py-2 flex justify-between items-center">
+            <h1 class="text-md font-bold text-stone-300 leading-none">
+                One<br />Word<br />Game
+            </h1>
+            <button class="btn" @click="handleLogOut">Log Out</button>
+        </div>
+    </header>
+    <div class="max-w-screen-md mx-auto">
+        <slot />
     </div>
 </template>

@@ -2,6 +2,10 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { object, string } from "yup";
 
+definePageMeta({
+    layout: "unauthenticated",
+});
+
 const schema = object({
     email: string().required().email(),
     password: string().required().min(10),
