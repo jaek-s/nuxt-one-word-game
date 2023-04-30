@@ -10,7 +10,8 @@
         "lint": "npm run lint:js && npm run lint:prettier",
         "lint:fix": "prettier --write --list-different . && npm run lint:js --fix",
         "lint:js": "eslint --ext \".ts,.vue\" --ignore-path .gitignore .",
-        "lint:prettier": "prettier --check ."
+        "lint:prettier": "prettier --check .",
+        "firebase": "firebase emulators:start"
     },
     "devDependencies": {
         "@nuxtjs/eslint-config-typescript": "^12.0.0",
