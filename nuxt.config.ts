@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    ssr: false,
     modules: [
         "@nuxtjs/eslint-module",
         "@nuxtjs/tailwindcss",
@@ -13,8 +14,15 @@ export default defineNuxtConfig({
             projectId: "js-one-word-game",
             storageBucket: "js-one-word-game.appspot.com",
             messagingSenderId: "262705775305",
-            appId: "1:262705775305:web:ad67a41f7c4539eac4c318",
+            appId: "1:262705775305:web:d28cbd593d3e74e5c4c318",
         },
+        auth: true,
+        /* appCheck: {
+            debug: process.env.NODE_ENV !== "production",
+            isTokenAutoRefreshEnabled: true,
+            provider: "ReCaptchaV3",
+            key: "6LdNA8wlAAAAAMKlKLtUl6jnd6CvxZJa_J2YU8w8",
+        }, */
     },
     veeValidate: {
         // disable or enable auto imports
