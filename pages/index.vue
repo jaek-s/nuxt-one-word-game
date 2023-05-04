@@ -12,13 +12,10 @@ watchEffect(() => {
 </script>
 
 <template>
-    <div class="h-full flex flex-col gap-4 w-full justify-center items-center">
-        <NuxtLink
-            to="/create-account"
-            class="btn-primary w-64 h-16 text-lg font-medium"
-        >
+    <div class="h-full flex flex-col gap-6 w-full justify-center">
+        <NuxtLink to="/create-account" class="btn-primary h-16 text-lg font-medium">
             Create an Account
         </NuxtLink>
-        <NuxtLink to="/login" class="btn w-64">Log In</NuxtLink>
+        <NuxtLink to="/login" class="btn">Log In</NuxtLink>
     </div>
 </template>
