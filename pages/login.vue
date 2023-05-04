@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { object, string, ref as yupRef } from "yup";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { object, string } from "yup";
 
 definePageMeta({
     layout: "unauthenticated",
@@ -8,14 +8,9 @@ definePageMeta({
 
 const schema = object({
     email: string()
-        .required("An email address is required")
+        .required("You must enter your email.")
         .email("This email address is invalid."),
-    password: string()
-        .required("A password is required.")
-        .min(8, "Your password must be at least 8 characters."),
-    passwordConfirmation: string()
-        .required("You must confirm your password.")
-        .oneOf([yupRef("password")], "The passwords do not match"),
+    password: string().required("You must enter your password."),
 });
 
 const handleSubmit = async ({ email, password }: Record<string, unknown>) => {
@@ -27,7 +22,7 @@ const handleSubmit = async ({ email, password }: Record<string, unknown>) => {
     }
 
     try {
-        await createUserWithEmailAndPassword(auth, email as string, password as string);
+        await signInWithEmailAndPassword(auth, email as string, password as string);
         navigateTo("/");
     } catch (error) {
         // show an error
@@ -39,7 +34,7 @@ const handleSubmit = async ({ email, password }: Record<string, unknown>) => {
 <template>
     <div class="w-full flex flex-col gap-4">
         <header>
-            <h1 class="font-semibold text-2xl">Create an Account</h1>
+            <h1 class="font-semibold text-2xl">Log In</h1>
         </header>
         <VeeForm
             class="flex flex-col gap-2"
@@ -48,11 +43,6 @@ const handleSubmit = async ({ email, password }: Record<string, unknown>) => {
         >
             <InputText name="email" type="email" />
             <InputText name="password" type="password" />
-            <InputText
-                label="confirm password"
-                name="passwordConfirmation"
-                type="password"
-            />
             <button type="submit" class="btn-primary">submit</button>
         </VeeForm>
     </div>
