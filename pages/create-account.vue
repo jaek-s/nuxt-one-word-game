@@ -13,9 +13,6 @@ const schema = object({
     password: string()
         .required("A password is required.")
         .min(8, "Your password must be at least 8 characters."),
-    passwordConfirmation: string()
-        .required("You must confirm your password.")
-        .oneOf([yupRef("password")], "The passwords do not match"),
 });
 
 const handleSubmit = async ({ email, password }: Record<string, unknown>) => {
@@ -37,23 +34,16 @@ const handleSubmit = async ({ email, password }: Record<string, unknown>) => {
 </script>
 
 <template>
-    <div class="w-full flex flex-col gap-4">
+    <VeeForm
+        class="w-full flex flex-col gap-2"
+        :validation-schema="schema"
+        @submit="handleSubmit"
+    >
         <header>
             <h1 class="font-semibold text-2xl">Create an Account</h1>
         </header>
-        <VeeForm
-            class="flex flex-col gap-2"
-            :validation-schema="schema"
-            @submit="handleSubmit"
-        >
-            <InputText name="email" type="email" />
-            <InputText name="password" type="password" />
-            <InputText
-                label="confirm password"
-                name="passwordConfirmation"
-                type="password"
-            />
-            <button type="submit" class="btn-primary">submit</button>
-        </VeeForm>
-    </div>
+        <InputText name="email" type="email" />
+        <InputPassword name="password" />
+        <button type="submit" class="btn-primary">submit</button>
+    </VeeForm>
 </template>

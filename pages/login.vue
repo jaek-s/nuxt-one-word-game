@@ -53,7 +53,7 @@ const handleSubmit = async (
 
 <template>
     <VeeForm
-        class="w-full flex flex-col gap-4"
+        class="w-full flex flex-col gap-2"
         :validation-schema="schema"
         @submit="handleSubmit"
     >
@@ -61,7 +61,7 @@ const handleSubmit = async (
             <h1 class="font-semibold text-2xl">Log In</h1>
         </header>
         <InputText name="email" type="email" />
-        <InputText name="password" type="password" />
+        <InputPassword name="password" />
         <button type="submit" class="btn-primary">submit</button>
         <span v-show="showGenericError" class="text-rose-300 text-sm">
             An unknown error occurred. Please refresh and try again.
