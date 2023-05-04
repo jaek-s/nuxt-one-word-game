@@ -23,7 +23,7 @@ const handleSubmit = async ({ email, password }: Record<string, unknown>) => {
 
     try {
         await signInWithEmailAndPassword(auth, email as string, password as string);
-        navigateTo("/");
+        navigateTo("/stories");
     } catch (error) {
         // show an error
         console.error(error);
