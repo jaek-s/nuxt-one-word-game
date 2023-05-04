@@ -2,7 +2,7 @@
     <div
         class="max-w-screen-sm mx-auto mt-16 px-8 flex flex-col justify-between gap-8 items-center sm:items-stretch sm:flex-row"
     >
-        <header class="w-64">
+        <header class="w-64 shrink-0">
             <NuxtLink to="/">
                 <h1 class="text-7xl font-black leading-none">
                     One<br />Word<br />Game

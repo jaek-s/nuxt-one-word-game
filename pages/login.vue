@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
 import { object, string } from "yup";
 
 definePageMeta({
     layout: "unauthenticated",
 });
+
+const showGenericError = ref(false);
 
 const schema = object({
     email: string()
@@ -13,11 +16,16 @@ const schema = object({
     password: string().required("You must enter your password."),
 });
 
-const handleSubmit = async ({ email, password }: Record<string, unknown>) => {
+const handleSubmit = async (
+    { email, password }: Record<string, unknown>,
+    { setFieldError }: Record<string, any>
+) => {
+    showGenericError.value = false;
+
     const auth = useFirebaseAuth();
 
     if (!auth) {
-        // show an error?
+        showGenericError.value = true;
         return;
     }
 
@@ -25,25 +33,38 @@ const handleSubmit = async ({ email, password }: Record<string, unknown>) => {
         await signInWithEmailAndPassword(auth, email as string, password as string);
         navigateTo("/stories");
     } catch (error) {
-        // show an error
-        console.error(error);
+        if (!(error instanceof FirebaseError)) {
+            showGenericError.value = true;
+            return;
+        }
+
+        if (error.code === "auth/user-not-found") {
+            return setFieldError("email", "A user with this email does not exist.");
+        }
+
+        if (error.code === "auth/wrong-password") {
+            return setFieldError("password", "This password is incorrect.");
+        }
+
+        showGenericError.value = true;
     }
 };
 </script>
 
 <template>
-    <div class="w-full flex flex-col gap-4">
+    <VeeForm
+        class="w-full flex flex-col gap-4"
+        :validation-schema="schema"
+        @submit="handleSubmit"
+    >
         <header>
             <h1 class="font-semibold text-2xl">Log In</h1>
         </header>
-        <VeeForm
-            class="flex flex-col gap-2"
-            :validation-schema="schema"
-            @submit="handleSubmit"
-        >
-            <InputText name="email" type="email" />
-            <InputText name="password" type="password" />
-            <button type="submit" class="btn-primary">submit</button>
-        </VeeForm>
-    </div>
+        <InputText name="email" type="email" />
+        <InputText name="password" type="password" />
+        <button type="submit" class="btn-primary">submit</button>
+        <span v-show="showGenericError" class="text-rose-300 text-sm">
+            An unknown error occurred. Please refresh and try again.
+        </span>
+    </VeeForm>
 </template>
