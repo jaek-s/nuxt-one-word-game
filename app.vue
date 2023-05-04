@@ -1,5 +1,4 @@
-<script setup>
-const router = useRouter();
+<script setup lang="ts">
 const route = useRoute();
 const user = useCurrentUser();
 
@@ -8,10 +7,10 @@ onMounted(() => {
     watch(user, (user, prevUser) => {
         if (prevUser && !user) {
             // user logged out
-            router.push("/");
+            navigateTo("/");
         } else if (user && typeof route.query.redirect === "string") {
             // user logged in
-            router.push(route.query.redirect);
+            navigateTo(route.query.redirect);
         }
     });
 });

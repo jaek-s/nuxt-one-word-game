@@ -45,7 +45,16 @@
             "plugin:prettier/recommended"
         ],
         "plugins": [],
-        "rules": {}
+        "rules": {
+            "vue/block-lang": [
+                "error",
+                {
+                    "script": {
+                        "lang": "ts"
+                    }
+                }
+            ]
+        }
     },
     "dependencies": {
         "@vee-validate/nuxt": "^4.8.6",

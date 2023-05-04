@@ -1,6 +1,12 @@
-<script setup>
+<script setup lang="ts">
 const handleLogOut = () => {
     const auth = useFirebaseAuth();
+
+    if (!auth) {
+        navigateTo("/");
+        return;
+    }
+
     auth.signOut();
 };
 </script>
@@ -13,9 +19,11 @@ const handleLogOut = () => {
             <div
                 class="max-w-screen-xl px-4 mx-auto py-2 flex justify-between items-center"
             >
-                <h1 class="text-md font-bold text-stone-300 leading-none">
-                    One<br />Word<br />Game
-                </h1>
+                <NuxtLink to="/stories">
+                    <h1 class="text-md font-bold text-stone-300 leading-none">
+                        One<br />Word<br />Game
+                    </h1>
+                </NuxtLink>
                 <button class="btn" @click="handleLogOut">Log Out</button>
             </div>
         </header>
