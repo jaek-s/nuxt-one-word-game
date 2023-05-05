@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { object, string, ref as yupRef } from "yup";
+import { object, string } from "yup";
 
 definePageMeta({
     layout: "unauthenticated",

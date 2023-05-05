@@ -1,16 +1,17 @@
 /* eslint no-console: "off" */
 
-import { connectAuthEmulator, getAuth } from "firebase/auth";
-import { type FirebaseApp } from "firebase/app";
+import { connectAuthEmulator } from "firebase/auth";
+import { connectFirestoreEmulator } from "firebase/firestore";
 
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(() => {
     // TODO: make it possible to turn this off
-    const firebaseApp = nuxtApp.$firebaseApp as FirebaseApp;
 
-    const auth = getAuth(firebaseApp);
+    connectFirestoreEmulator(useFirestore(), "localhost", 7070);
 
+    const auth = useFirebaseAuth();
     if (!auth) {
         console.log("⚠️ can't get auth in firebase emulator plugin");
+        return;
     }
 
     try {
