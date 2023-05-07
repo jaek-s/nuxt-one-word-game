@@ -4,9 +4,21 @@ export default defineNuxtConfig({
     modules: [
         "@nuxtjs/eslint-module",
         "@nuxtjs/tailwindcss",
-        "nuxt-vuefire",
+        "@pinia/nuxt",
         "@vee-validate/nuxt",
+        "nuxt-vuefire",
     ],
+    veeValidate: {
+        // disable or enable auto imports
+        autoImports: true,
+        // Use different names for components
+        componentNames: {
+            Form: "VeeForm",
+            Field: "VeeField",
+            FieldArray: "VeeFieldArray",
+            ErrorMessage: "VeeErrorMessage",
+        },
+    },
     vuefire: {
         config: {
             apiKey: "AIzaSyCFR8hkuNn09BV3hq6CUUHA7DTKJw8iS58",
@@ -23,16 +35,5 @@ export default defineNuxtConfig({
             provider: "ReCaptchaV3",
             key: "6LdNA8wlAAAAAMKlKLtUl6jnd6CvxZJa_J2YU8w8",
         }, */
-    },
-    veeValidate: {
-        // disable or enable auto imports
-        autoImports: true,
-        // Use different names for components
-        componentNames: {
-            Form: "VeeForm",
-            Field: "VeeField",
-            FieldArray: "VeeFieldArray",
-            ErrorMessage: "VeeErrorMessage",
-        },
     },
 });
