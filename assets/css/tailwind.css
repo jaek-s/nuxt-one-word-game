@@ -10,7 +10,7 @@
 
 @layer components {
     .btn {
-        @apply flex items-center justify-center rounded px-4 py-2 bg-stone-600 text-stone-300;
+        @apply flex items-center justify-center rounded px-5 py-2.5 bg-stone-600 text-stone-300;
 
         &-primary {
             @apply btn bg-stone-400 text-stone-900;
