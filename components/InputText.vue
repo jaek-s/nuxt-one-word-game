@@ -31,7 +31,7 @@ const id = nanoid();
             />
             <slot />
             <label
-                class="transition-all absolute text-stone-400 cursor-text bg-stone-800 px-1 text-base top-2 left-3 peer-[&:not(:placeholder-shown)]:text-xs peer-[&:not(:placeholder-shown)]:-top-2 peer-[&:not(:placeholder-shown)]:left-2 peer-focus-visible:text-xs peer-focus-visible:-top-2 peer-focus-visible:left-2 peer-focus-visible:text-stone-200"
+                class="transition-all absolute text-stone-500 cursor-text bg-stone-800 px-1 text-base top-2 left-3 peer-[&:not(:placeholder-shown)]:text-xs peer-[&:not(:placeholder-shown)]:-top-2.5 peer-[&:not(:placeholder-shown)]:left-2 peer-[&:not(:placeholder-shown)]:text-stone-200 peer-focus-visible:text-xs peer-focus-visible:-top-2.5 peer-focus-visible:left-2 peer-focus-visible:text-stone-200"
                 :for="id"
                 v-text="displayedLabel"
             />
