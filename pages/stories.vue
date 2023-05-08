@@ -6,7 +6,7 @@ definePageMeta({
     middleware: ["check-authentication"],
 });
 
-const storyStore = useStoryStore();
+const stories = useStoryStore();
 
 const createStorySchema = object({
     name: string().required("You must give your new story a name."),
@@ -16,7 +16,7 @@ const createStory = (
     { name }: Record<string, unknown>,
     { resetForm }: Record<string, any>
 ) => {
-    storyStore.addStory(name as string);
+    stories.addStory(name as string);
     resetForm();
 };
 </script>
@@ -32,6 +32,23 @@ const createStory = (
             <InputText name="name" label="Story Name" />
             <button class="btn-primary" type="submit">create</button>
         </VeeForm>
-        <pre v-text="storyStore.stories" />
+        <section class="w-full divide-y-2 divide-stone-700">
+            <div class="grid grid-cols-3 font-bold text-lg w-full px-6 py-4">
+                <span>name</span>
+                <span>owner</span>
+                <span>actions</span>
+            </div>
+            <div
+                v-for="story in stories.stories"
+                :key="story.id"
+                class="grid grid-cols-3 w-full px-6 py-4"
+            >
+                <span v-text="story.name" />
+                <span v-text="story.owner" />
+                <span>
+                    <button @click="stories.deleteStory(story.id)">delete</button>
+                </span>
+            </div>
+        </section>
     </div>
 </template>

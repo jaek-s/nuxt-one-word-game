@@ -1,4 +1,4 @@
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, deleteDoc, query, where } from "firebase/firestore";
 import { defineStore } from "pinia";
 
 export interface Story {
@@ -8,22 +8,32 @@ export interface Story {
 
 export const useStoryStore = defineStore("stories", () => {
     /* --------------------------------- private -------------------------------- */
-    const db = useFirestore();
-    const firestoreStories = collection(db, "stories");
     const user = useCurrentUser();
 
-    /* --------------------------------- public --------------------------------- */
-    const stories = ref(useCollection<Story>(firestoreStories));
-    const addStory = (name: string) => {
-        if (!user.value) {
-            throw new Error("You must be logged in to create a new story.");
-        }
+    if (!user.value) {
+        throw new Error("You must be logged in to access stories.");
+    }
 
-        addDoc(firestoreStories, {
-            owner: user.value.uid,
+    const db = useFirestore();
+    const firestoreStoriesCollection = collection(db, "stories");
+    const firestoreQueriedStories = query(
+        firestoreStoriesCollection,
+        where("owner", "==", user.value.uid)
+    );
+
+    /* --------------------------------- public --------------------------------- */
+    const stories = useCollection<Story>(firestoreQueriedStories);
+
+    const addStory = (name: string) => {
+        addDoc(firestoreStoriesCollection, {
+            owner: user.value?.uid,
             name,
         });
     };
 
-    return { stories, addStory };
+    const deleteStory = (id: string) => {
+        deleteDoc(doc(db, "stories", id));
+    };
+
+    return { stories, addStory, deleteStory };
 });
