@@ -16,7 +16,7 @@ const createStory = (
     { name }: Record<string, unknown>,
     { resetForm }: Record<string, any>
 ) => {
-    stories.addStory(name as string);
+    stories.add(name as string);
     resetForm();
 };
 </script>
@@ -39,14 +39,14 @@ const createStory = (
                 <span>actions</span>
             </div>
             <div
-                v-for="story in stories.stories"
+                v-for="story in stories.collection"
                 :key="story.id"
                 class="grid grid-cols-3 w-full px-6 py-4"
             >
                 <span v-text="story.name" />
                 <span v-text="story.owner" />
                 <span>
-                    <button @click="stories.deleteStory(story.id)">delete</button>
+                    <button @click="stories.delete(story.id)">delete</button>
                 </span>
             </div>
         </section>

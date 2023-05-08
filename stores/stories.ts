@@ -35,5 +35,5 @@ export const useStoryStore = defineStore("stories", () => {
         deleteDoc(doc(db, "stories", id));
     };
 
-    return { stories, addStory, deleteStory };
+    return { collection: stories, add: addStory, delete: deleteStory };
 });
