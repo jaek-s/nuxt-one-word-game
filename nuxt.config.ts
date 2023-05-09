@@ -4,7 +4,6 @@ export default defineNuxtConfig({
     modules: [
         "@nuxtjs/eslint-module",
         "@nuxtjs/tailwindcss",
-        "@pinia/nuxt",
         "@vee-validate/nuxt",
         "nuxt-vuefire",
     ],
