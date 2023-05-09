@@ -1,23 +1,34 @@
 <script setup lang="ts">
 import { object, string } from "yup";
-import { useStoryStore } from "@/stores/stories";
+import { addDoc, collection, doc, deleteDoc, query, where } from "firebase/firestore";
+import type { Story } from "@/types";
 
 definePageMeta({
     middleware: ["check-authentication"],
 });
 
-const stories = useStoryStore();
+const user = useCurrentUser();
+const storiesCollection = collection(useFirestore(), "stories");
+const stories = useCollection<Story>(
+    query(storiesCollection, where("owner", "==", user.value?.uid))
+);
 
 const createStorySchema = object({
     name: string().required("You must give your new story a name."),
 });
-
 const createStory = (
     { name }: Record<string, unknown>,
     { resetForm }: Record<string, any>
 ) => {
-    stories.add(name as string);
+    addDoc(storiesCollection, {
+        owner: user.value?.uid,
+        name,
+    });
     resetForm();
+};
+
+const deleteStory = (storyId: string) => {
+    deleteDoc(doc(storiesCollection, storyId));
 };
 </script>
 
@@ -39,14 +50,14 @@ const createStory = (
                 <span>actions</span>
             </div>
             <div
-                v-for="story in stories.collection"
+                v-for="story in stories"
                 :key="story.id"
                 class="grid grid-cols-3 w-full px-6 py-4"
             >
-                <span v-text="story.name" />
+                <NuxtLink :to="`/stories/${story.id}`" v-text="story.name" />
                 <span v-text="story.owner" />
                 <span>
-                    <button @click="stories.delete(story.id)">delete</button>
+                    <button @click="deleteStory(story.id)">delete</button>
                 </span>
             </div>
         </section>
