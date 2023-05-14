@@ -6,8 +6,24 @@ service cloud.firestore {
         }
 
         match /stories/{storyId} {
-            allow read, update, delete: if request.auth != null && resource.data.owner == request.auth.uid;
-            allow create: if request.auth != null && request.resource.data.owner == request.auth.uid;
+            function storyOwnedByOrSharedWithUser(storyData) {
+                return request.auth.uid == storyData.owner || request.auth.uid in storyData.sharedWith
+            }
+
+            allow read: if request.auth != null && storyOwnedByOrSharedWithUser(resource.data);
+            allow update, delete: if request.auth != null && request.auth.uid == resource.data.owner;
+            allow create: if request.auth != null && request.auth.uid == request.resource.data.owner;
+
+
+            match /words/{wordId} {
+                function getStoryData() {
+                    return get(/databases/$(database)/documents/stories/$(storyId)).data
+                }
+
+                allow read: if  request.auth != null && storyOwnedByOrSharedWithUser(getStoryData());
+                allow update, delete: if request.auth != null && (resource.data.author == request.auth.uid || getStoryData().owner == request.auth.uid);
+                allow create: if request.auth != null && request.resource.data.author == request.auth.uid;
+            }
         }
     }
 }

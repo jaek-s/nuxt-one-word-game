@@ -15,6 +15,7 @@
     },
     "dependencies": {
         "@vee-validate/nuxt": "^4.8.6",
+        "firebase": "^9.22.0",
         "nanoid": "^4.0.2",
         "nuxt-vuefire": "^0.1.6",
         "vuefire": "^3.1.0",

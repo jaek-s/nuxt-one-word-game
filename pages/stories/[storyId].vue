@@ -1,19 +1,31 @@
 <script setup lang="ts">
-import { doc } from "firebase/firestore";
+import { useSingleStory, useStoryWords } from "@/composables/stories";
+
+definePageMeta({
+    middleware: ["check-authentication"],
+});
 
 const route = useRoute();
 
-const storyDoc = computed(() =>
-    doc(useFirestore(), "stories", route.params.storyId as string)
-);
-//TODO: if storyDoc doesn't exist, redirect to 404
+const storyId = computed(() => route.params.storyId as string);
+const story = useSingleStory(storyId);
 
-const story = useDocument(storyDoc);
+// // TODO: figure out a way to throw a 404 if story definitely doesn't exist.
+// if (!story.value) { // This doesn't work
+//     throw createError({
+//         statusCode: 404,
+//         statusMessage: "Story Not Found",
+//         fatal: true,
+//     });
+// }
+
+const words = useStoryWords(storyId);
 </script>
 
 <template>
-    <div>
-        <h1>story {{ story?.id }}</h1>
-        <h2 v-text="story?.name" />
-    </div>
+    <section>
+        <h1 class="text-7xl font-bold" v-text="story?.name" />
+        <pre v-text="story" />
+        <pre v-text="words" />
+    </section>
 </template>

@@ -1,34 +1,24 @@
 <script setup lang="ts">
 import { object, string } from "yup";
-import { addDoc, collection, doc, deleteDoc, query, where } from "firebase/firestore";
-import type { Story } from "@/types";
+import { useCreateStory, useDeleteStory, useStoryList } from "@/composables/stories";
 
 definePageMeta({
     middleware: ["check-authentication"],
 });
 
-const user = useCurrentUser();
-const storiesCollection = collection(useFirestore(), "stories");
-const stories = useCollection<Story>(
-    query(storiesCollection, where("owner", "==", user.value?.uid))
-);
+const deleteStory = useDeleteStory();
+const createStory = useCreateStory();
+const stories = useStoryList();
 
 const createStorySchema = object({
     name: string().required("You must give your new story a name."),
 });
-const createStory = (
+const handleCreateFormSubmit = (
     { name }: Record<string, unknown>,
     { resetForm }: Record<string, any>
 ) => {
-    addDoc(storiesCollection, {
-        owner: user.value?.uid,
-        name,
-    });
+    createStory(name as string);
     resetForm();
-};
-
-const deleteStory = (storyId: string) => {
-    deleteDoc(doc(storiesCollection, storyId));
 };
 </script>
 
@@ -38,7 +28,7 @@ const deleteStory = (storyId: string) => {
         <VeeForm
             :validation-schema="createStorySchema"
             class="flex items-start gap-2"
-            @submit="createStory"
+            @submit="handleCreateFormSubmit"
         >
             <InputText name="name" label="Story Name" />
             <button class="btn-primary" type="submit">create</button>
@@ -54,7 +44,7 @@ const deleteStory = (storyId: string) => {
                 :key="story.id"
                 class="grid grid-cols-3 w-full px-6 py-4"
             >
-                <NuxtLink :to="`/stories/${story.id}`" v-text="story.name" />
+                <NuxtLink :to="`/stories/${story.id}`">{{ story.name }}</NuxtLink>
                 <span v-text="story.owner" />
                 <span>
                     <button @click="deleteStory(story.id)">delete</button>
