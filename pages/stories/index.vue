@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { object, string } from "yup";
-import { useCreateStory, useDeleteStory, useStoryList } from "@/composables/stories";
+import {
+    useCreateStory,
+    useDeleteStory,
+    useOwnedStoryList,
+} from "@/composables/stories";
 
 definePageMeta({
     middleware: ["check-authentication"],
@@ -8,12 +12,12 @@ definePageMeta({
 
 const deleteStory = useDeleteStory();
 const createStory = useCreateStory();
-const stories = useStoryList();
+const stories = useOwnedStoryList();
 
 const createStorySchema = object({
     name: string().required("You must give your new story a name."),
 });
-const handleCreateFormSubmit = (
+const handleNewStoryFormSubmit = (
     { name }: Record<string, unknown>,
     { resetForm }: Record<string, any>
 ) => {
@@ -28,7 +32,7 @@ const handleCreateFormSubmit = (
         <VeeForm
             :validation-schema="createStorySchema"
             class="flex items-start gap-2"
-            @submit="handleCreateFormSubmit"
+            @submit="handleNewStoryFormSubmit"
         >
             <InputText name="name" label="Story Name" />
             <button class="btn-primary" type="submit">create</button>
@@ -44,8 +48,8 @@ const handleCreateFormSubmit = (
                 :key="story.id"
                 class="grid grid-cols-3 w-full px-6 py-4"
             >
-                <NuxtLink :to="`/stories/${story.id}`">{{ story.name }}</NuxtLink>
-                <span v-text="story.owner" />
+                <NuxtLink :to="`/stories/${story.id}`">{{ story.data.name }}</NuxtLink>
+                <span v-text="story.data.owner" />
                 <span>
                     <button @click="deleteStory(story.id)">delete</button>
                 </span>

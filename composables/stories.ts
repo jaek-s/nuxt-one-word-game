@@ -6,6 +6,7 @@ import {
     query,
     where,
     Timestamp,
+    serverTimestamp,
 } from "firebase/firestore";
 import type { FirestoreDataConverter, FieldValue } from "firebase/firestore";
 
@@ -15,92 +16,103 @@ import type { FirestoreDataConverter, FieldValue } from "firebase/firestore";
 
 type MaybeRefString = Ref<string | undefined> | string | undefined;
 
-const cleanSourceData = (sourceData: object, destination: object) =>
-    Object.entries(sourceData).reduce(
-        (accumulator: Record<any, any>, [key, value]: [any, any]) => {
-            if (!Object.hasOwn(destination, key)) {
+abstract class FirestoreRecord {
+    id = "";
+    data: Record<string, unknown> = {};
+
+    constructor(id?: string) {
+        if (id) {
+            this.id = id;
+        }
+    }
+}
+
+class Story extends FirestoreRecord {
+    data = {
+        owner: "",
+        name: "",
+        sharedWith: [] as string[],
+    };
+
+    constructor(sourceData: object = {}, id?: string) {
+        super(id);
+        Object.assign(this.data, sourceData);
+
+        console.debug(sourceData, this.data);
+    }
+}
+
+class StoryWord extends FirestoreRecord {
+    id = "";
+    data = {
+        created: Timestamp.now() as Timestamp | FieldValue,
+        author: "",
+        content: "",
+    };
+
+    constructor(sourceData: object = {}, id?: string) {
+        super(id);
+        Object.assign(this.data, sourceData);
+    }
+}
+
+const getDataConverter = <T extends FirestoreRecord>(
+    RecordType: new (data?: Record<string, unknown>, id?: string) => T
+): FirestoreDataConverter<T> => ({
+    toFirestore: (newRecord: T) =>
+        Object.entries(new RecordType().data).reduce(
+            (accumulator: Record<any, any>, [key, defaultValue]: [string, any]) => {
+                accumulator[key] = newRecord.data[key] ?? defaultValue;
                 return accumulator;
-            }
+            },
+            {}
+        ),
+    fromFirestore: (snapshot) => new RecordType(snapshot.data(), snapshot.id),
+});
 
-            accumulator[key] = value;
-            return accumulator;
-        },
-        {}
-    );
+const getCurrentUserId = () => {
+    const uid = useCurrentUser().value?.uid;
 
-class Story {
-    id?: string;
-    owner = "";
-    name = "";
-    sharedWith: string[] = [];
-
-    constructor(sourceData: object = {}) {
-        Object.assign(this, cleanSourceData(sourceData, this));
+    if (!uid) {
+        throw new Error("must be logged in");
     }
-}
 
-class StoryWord {
-    id?: string;
-    created: Timestamp | FieldValue = Timestamp.now();
-    author = "";
-    content = "";
-
-    constructor(sourceData: object = {}) {
-        Object.assign(this, cleanSourceData(sourceData, this));
-    }
-}
-
-const storyDataConverter: FirestoreDataConverter<Story> = {
-    toFirestore: (data) => ({ ...new Story(data) }),
-    fromFirestore: (snapshot) => new Story({ ...snapshot.data(), id: snapshot.id }),
-};
-
-const storyWordDataConverter: FirestoreDataConverter<StoryWord> = {
-    toFirestore: (data) => ({ ...new StoryWord(data) }),
-    fromFirestore: (snapshot) => new StoryWord({ ...snapshot.data(), id: snapshot.id }),
+    return uid;
 };
 
 const getStoriesCollection = () =>
-    collection(useFirestore(), "stories").withConverter(storyDataConverter);
+    collection(useFirestore(), "stories").withConverter(getDataConverter<Story>(Story));
 
 const getStoryDoc = (storyId: MaybeRefString) =>
-    doc(getStoriesCollection(), ref(storyId).value).withConverter(storyDataConverter);
+    doc(getStoriesCollection(), ref(storyId).value).withConverter(
+        getDataConverter<Story>(Story)
+    );
+
+const getStoryWordCollection = (storyId: MaybeRefString) =>
+    collection(getStoryDoc(storyId), "words").withConverter(
+        getDataConverter<StoryWord>(StoryWord)
+    );
 
 /* -------------------------------------------------------------------------- */
 /*                                   public                                   */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Returns a function that can be used to create a story in firebase
- * @returns function
- */
-export const useCreateStory = () => (storyName: string) => {
-    /**
-     * The storyDataConverter will automatically add any missing fields to this object,
-     * so we can safely say it's of type Story, even though it's missing fields
-     */
-    const newStory = {
-        owner: useCurrentUser().value?.uid,
-        name: storyName,
-    } as Story;
-
-    addDoc(getStoriesCollection(), newStory);
-};
-
-/**
- * Returns a function that can be used to delete a story in firebase
- * @returns function
- */
-export const useDeleteStory = () => (storyId: MaybeRefString) =>
-    deleteDoc(getStoryDoc(storyId));
-
-/**
- * Returns a reactive list of stories the current user has access to
+ * Returns a reactive list of stories the current user owns
  * @returns Story[]
  */
-export const useStoryList = () =>
+export const useOwnedStoryList = () =>
     useCollection(
-        query(getStoriesCollection(), where("owner", "==", useCurrentUser().value?.uid))
+        query(getStoriesCollection(), where("owner", "==", getCurrentUserId()))
+    );
+
+/**
+ * Returns a reactive list of stories shared with the current user
+ * @returns Story[]
+ */
+export const useSharedStoryList = () =>
+    useCollection(
+        query(getStoriesCollection(), where(getCurrentUserId(), "in", "sharedWith"))
     );
 
 /**
@@ -112,11 +124,46 @@ export const useSingleStory = (storyId: MaybeRefString) =>
     useDocument(getStoryDoc(storyId));
 
 /**
+ * Returns a function that can be used to create a story in firebase
+ * @returns function
+ */
+export const useCreateStory = () => (storyName: string) => {
+    /**
+     * The storyDataConverter will automatically add any missing fields to this object,
+     * so we can safely say it's of type Story, even though it's missing fields
+     */
+
+    return addDoc(
+        getStoriesCollection(),
+        new Story({
+            owner: getCurrentUserId(),
+            name: storyName,
+        })
+    );
+};
+
+/**
+ * Returns a function that can be used to delete a story in firebase
+ * @returns function
+ */
+export const useDeleteStory = () => (storyId: MaybeRefString) =>
+    deleteDoc(getStoryDoc(storyId));
+
+/**
  * Returns a reactive list of words for a specific story
  * @param storyId ID of the story to get words for
  * @returns StoryWord[]
  */
 export const useStoryWords = (storyId: MaybeRefString) =>
-    useCollection<StoryWord>(
-        collection(getStoryDoc(storyId), "words").withConverter(storyWordDataConverter)
-    );
+    useCollection<StoryWord>(getStoryWordCollection(storyId));
+
+export const useCreateStoryWord =
+    () => (storyId: MaybeRefString, wordContent: MaybeRefString) =>
+        addDoc(
+            getStoryWordCollection(storyId),
+            new StoryWord({
+                created: serverTimestamp(),
+                author: getCurrentUserId(),
+                content: ref(wordContent).value,
+            })
+        );

@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { useSingleStory, useStoryWords } from "@/composables/stories";
+import { object, string } from "yup";
+import {
+    useSingleStory,
+    useStoryWords,
+    useCreateStoryWord,
+} from "@/composables/stories";
 
 definePageMeta({
     middleware: ["check-authentication"],
@@ -20,12 +25,43 @@ const story = useSingleStory(storyId);
 // }
 
 const words = useStoryWords(storyId);
+const createStoryWord = useCreateStoryWord();
+
+const newWordSchema = object({
+    word: string()
+        .required("A word is required")
+        .matches(/^[^\s]*$/, "You can only enter one word at a time"),
+});
+const handleNewWordFormSubmit = (
+    { word }: Record<string, unknown>,
+    { resetForm }: Record<string, any>
+) => {
+    createStoryWord(storyId, word as string);
+    resetForm();
+};
 </script>
 
 <template>
     <section>
-        <h1 class="text-7xl font-bold" v-text="story?.name" />
-        <pre v-text="story" />
+        <h1 class="text-7xl font-bold" v-text="story?.data.name" />
+        <VeeForm
+            :validation-schema="newWordSchema"
+            class="flex items-start gap-2"
+            @submit="handleNewWordFormSubmit"
+        >
+            <InputText name="word" label="Add a Word" />
+            <button class="btn-primary" type="submit">add</button>
+        </VeeForm>
+
+        <p>
+            <span
+                v-for="word in words"
+                :key="word.id"
+                v-text="word.data.content + ' '"
+            />
+        </p>
+        <hr />
+        <pre v-text="story?.data" />
         <pre v-text="words" />
     </section>
 </template>
