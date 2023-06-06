@@ -42,8 +42,18 @@ const handleNewWordFormSubmit = (
 </script>
 
 <template>
-    <section>
+    <section class="flex flex-col gap-4">
         <h1 class="text-7xl font-bold" v-text="story?.data.name" />
+
+        <p v-if="words.length">
+            <template v-for="word in words" :key="word.id">
+                <span v-text="word.data.content" />{{ " " }}
+            </template>
+        </p>
+        <h2 v-else class="text-2xl text-stone-400">
+            Your story begins! Invite a friend and add the first word to get started.
+        </h2>
+
         <VeeForm
             :validation-schema="newWordSchema"
             class="flex items-start gap-2"
@@ -52,16 +62,5 @@ const handleNewWordFormSubmit = (
             <InputText name="word" label="Add a Word" />
             <button class="btn-primary" type="submit">add</button>
         </VeeForm>
-
-        <p>
-            <span
-                v-for="word in words"
-                :key="word.id"
-                v-text="word.data.content + ' '"
-            />
-        </p>
-        <hr />
-        <pre v-text="story?.data" />
-        <pre v-text="words" />
     </section>
 </template>
