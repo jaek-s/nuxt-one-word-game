@@ -3,6 +3,7 @@ import {
     collection,
     doc,
     deleteDoc,
+    orderBy,
     query,
     where,
     Timestamp,
@@ -155,7 +156,9 @@ export const useDeleteStory = () => (storyId: MaybeRefString) =>
  * @returns StoryWord[]
  */
 export const useStoryWords = (storyId: MaybeRefString) =>
-    useCollection<StoryWord>(getStoryWordCollection(storyId));
+    useCollection<StoryWord>(
+        query(getStoryWordCollection(storyId), orderBy("created"))
+    );
 
 export const useCreateStoryWord =
     () => (storyId: MaybeRefString, wordContent: MaybeRefString) =>
