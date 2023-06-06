@@ -1,6 +1,8 @@
-# Nuxt 3 Minimal Starter
+# One word game.
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+An attempt at a collaborative story telling game built with nuxt and firebase.
+
+Based on the Nuxt 3 Minimal Starter. Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
 ## Setup
 
