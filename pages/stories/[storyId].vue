@@ -34,7 +34,7 @@ const newWordSchema = object({
 });
 const handleNewWordFormSubmit = (
     { word }: Record<string, unknown>,
-    { resetForm }: Record<string, any>
+    { resetForm }: Record<string, any>,
 ) => {
     createStoryWord(storyId, word as string);
     resetForm();

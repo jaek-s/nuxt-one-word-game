@@ -18,7 +18,7 @@ const schema = object({
 
 const handleSubmit = async (
     { email, password }: Record<string, unknown>,
-    { setFieldError }: Record<string, any>
+    { setFieldError }: Record<string, any>,
 ) => {
     showGenericError.value = false;
 

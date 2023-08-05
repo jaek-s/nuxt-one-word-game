@@ -58,7 +58,7 @@ class StoryWord extends FirestoreRecord {
 }
 
 const getDataConverter = <T extends FirestoreRecord>(
-    RecordType: new (data?: Record<string, unknown>, id?: string) => T
+    RecordType: new (data?: Record<string, unknown>, id?: string) => T,
 ): FirestoreDataConverter<T> => ({
     toFirestore: (newRecord: T) =>
         Object.entries(new RecordType().data).reduce(
@@ -66,7 +66,7 @@ const getDataConverter = <T extends FirestoreRecord>(
                 accumulator[key] = newRecord.data[key] ?? defaultValue;
                 return accumulator;
             },
-            {}
+            {},
         ),
     fromFirestore: (snapshot) => new RecordType(snapshot.data(), snapshot.id),
 });
@@ -86,12 +86,12 @@ const getStoriesCollection = () =>
 
 const getStoryDoc = (storyId: MaybeRefString) =>
     doc(getStoriesCollection(), ref(storyId).value).withConverter(
-        getDataConverter<Story>(Story)
+        getDataConverter<Story>(Story),
     );
 
 const getStoryWordCollection = (storyId: MaybeRefString) =>
     collection(getStoryDoc(storyId), "words").withConverter(
-        getDataConverter<StoryWord>(StoryWord)
+        getDataConverter<StoryWord>(StoryWord),
     );
 
 /* -------------------------------------------------------------------------- */
@@ -104,7 +104,7 @@ const getStoryWordCollection = (storyId: MaybeRefString) =>
  */
 export const useOwnedStoryList = () =>
     useCollection(
-        query(getStoriesCollection(), where("owner", "==", getCurrentUserId()))
+        query(getStoriesCollection(), where("owner", "==", getCurrentUserId())),
     );
 
 /**
@@ -113,7 +113,7 @@ export const useOwnedStoryList = () =>
  */
 export const useSharedStoryList = () =>
     useCollection(
-        query(getStoriesCollection(), where(getCurrentUserId(), "in", "sharedWith"))
+        query(getStoriesCollection(), where(getCurrentUserId(), "in", "sharedWith")),
     );
 
 /**
@@ -139,7 +139,7 @@ export const useCreateStory = () => (storyName: string) => {
         new Story({
             owner: getCurrentUserId(),
             name: storyName,
-        })
+        }),
     );
 };
 
@@ -157,7 +157,7 @@ export const useDeleteStory = () => (storyId: MaybeRefString) =>
  */
 export const useStoryWords = (storyId: MaybeRefString) =>
     useCollection<StoryWord>(
-        query(getStoryWordCollection(storyId), orderBy("created"))
+        query(getStoryWordCollection(storyId), orderBy("created")),
     );
 
 export const useCreateStoryWord =
@@ -168,5 +168,5 @@ export const useCreateStoryWord =
                 created: serverTimestamp(),
                 author: getCurrentUserId(),
                 content: ref(wordContent).value,
-            })
+            }),
         );

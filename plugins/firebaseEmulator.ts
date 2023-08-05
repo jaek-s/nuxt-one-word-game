@@ -20,7 +20,7 @@ export default defineNuxtPlugin(() => {
     } catch (error) {
         console.log(
             "❌ error connecting to auth emulator in firebase emulator plugin",
-            error
+            error,
         );
     }
 });

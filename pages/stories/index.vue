@@ -19,7 +19,7 @@ const createStorySchema = object({
 });
 const handleNewStoryFormSubmit = (
     { name }: Record<string, unknown>,
-    { resetForm }: Record<string, any>
+    { resetForm }: Record<string, any>,
 ) => {
     createStory(name as string);
     resetForm();
